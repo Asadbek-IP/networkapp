@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart';
+import 'package:networkapp/model/model.dart';
 import 'package:networkapp/services/api.dart';
 
 void main(List<String> args) {
@@ -30,31 +31,78 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String data = '';
+  List<Employee>? list;
   bool isLoading = true;
 
-  getPost() async {
-    Network.GET("/users", {}).then((javob) {
+  get() async {
+    Network.GET("/api/v1/employees", {}).then((javob) {
       setState(() {
-        data = javob;
+        list = javob.data;
         isLoading = false;
       });
     });
   }
 
+  //  post() async {
+  //   Network.Post(api:"/posts", params: root.toJson()).then((javob) {
+  //     setState(() {
+  //       data2 = javob;
+  //       isLoading = false;
+  //     });
+  //   });
+  // }
+
+  //  put() async {
+  //   Network.PUT("/posts/"+root.id.toString(), root.toJson()).then((javob) {
+  //     setState(() {
+  //       data3 = javob;
+  //       isLoading = false;
+  //     });
+  //   });
+  // }
+  // delete() async {
+  //   Network.DELETE("/posts/"+root.id.toString(), {}).then((javob) {
+  //     setState(() {
+  //       data4 = javob;
+  //       isLoading = false;
+  //     });
+  //   });
+  // }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getPost();
+    get();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(child: Text(data),)
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: list!.length,
+              itemBuilder: ((context, index) => item(list![index]))),
     );
   }
+}
+
+Widget item(Employee ishchi) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "${ishchi.employeename!}(${ishchi.employeeage!})",
+          style: const TextStyle(fontSize: 19),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        Text("${ishchi.employeesalary!}\$"),
+      ],
+    ),
+  );
 }
